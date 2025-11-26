@@ -1,5 +1,8 @@
 package com.napnap.heartbridge.ui
 
+import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -7,22 +10,22 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Battery0Bar
-import androidx.compose.material.icons.filled.Watch
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun MainScreen(){
@@ -30,8 +33,17 @@ fun MainScreen(){
         modifier = Modifier.fillMaxWidth(),
     ){
         val text = "---"
+        val context = LocalContext.current
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable{
+                    Toast.makeText(
+                        context,
+                        "No device connected",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                },
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.Bottom
         ) {
@@ -49,29 +61,38 @@ fun MainScreen(){
             )
             Text(
                 "BPM",
-                style = MaterialTheme.typography.bodyMedium,
+                fontSize = 50.sp,
                 color = Color.Red
             )
 
             Spacer(modifier = Modifier.weight(1f))
         }
 
-        Button(
-            onClick = { /* */},
+        Box(
             modifier = Modifier
                 .padding( 16.dp, 5.dp )
-                .fillMaxWidth(),
-            shape = RoundedCornerShape(8.dp),
-            enabled = true,
-            contentPadding = PaddingValues(12.dp)
+                .fillMaxWidth()
+                .background(
+                    color = MaterialTheme.colorScheme.primary,
+                    shape = RoundedCornerShape(8.dp)
+                )
         ){
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .padding(12.dp)
+                    .fillMaxWidth() ,
                 horizontalArrangement = Arrangement.SpaceBetween
             ){
-                Icon(Icons.Default.Watch,"",modifier = Modifier.padding(start = 10.dp))
-                Text(text = "Urządzenie")
-                Icon(Icons.Default.Battery0Bar,"",modifier = Modifier.padding(end = 10.dp))
+                Text( "Brak urządzenia", style = MaterialTheme.typography.bodySmall)
+                Row{
+                    Text( "--%", style = MaterialTheme.typography.bodySmall)
+                    Icon(
+                        Icons.Default.Battery0Bar,
+                        "",
+                        modifier = Modifier.padding(end = 10.dp),
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
             }
         }
 
@@ -81,10 +102,12 @@ fun MainScreen(){
                 .padding( 16.dp,5.dp)
                 .fillMaxWidth(),
             shape = RoundedCornerShape(8.dp),
-            enabled = true,
-            contentPadding = PaddingValues(12.dp)
+            contentPadding = PaddingValues(12.dp),
+            colors = ButtonDefaults.buttonColors(
+                contentColor = Color.Black
+            )
         ){
-            Text(text = "Wyszukaj urządzenia")
+            Text(text = "Wyszukaj urządzenia", style = MaterialTheme.typography.bodySmall)
         }
 
     }

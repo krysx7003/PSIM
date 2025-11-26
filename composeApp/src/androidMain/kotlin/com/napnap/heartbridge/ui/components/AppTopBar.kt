@@ -23,13 +23,26 @@ import com.napnap.heartbridge.ui.Screen
 @Composable
 fun AppTopBar( navController: NavHostController) {
     val route = navController.currentBackStackEntryAsState().value?.destination?.route
+    var title = ""
+    when (route) {
+        Screen.Main.route -> {
+            title = Screen.Main.title
+        }
+        Screen.Settings.route -> {
+            title = Screen.Settings.title
+        }
+        Screen.History.route -> {
+            title = Screen.History.title
+        }
+    }
+
     TopAppBar(
         modifier = Modifier.height(100.dp),
         title = {
             Text(
-                "",
+                title,
                 modifier = Modifier.padding(top = 5.dp),
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyMedium
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
