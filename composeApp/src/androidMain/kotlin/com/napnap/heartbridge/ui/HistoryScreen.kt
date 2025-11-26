@@ -72,7 +72,7 @@ fun TableRow(date: String,hour: String,bpm: String,thickness:Int){
             date,
             modifier = Modifier
                 .padding(start = 16.dp)
-                .weight(2f), // Takes available space
+                .weight(2f),
             color = MaterialTheme.colorScheme.onSecondary,
             style = MaterialTheme.typography.bodyMedium
         )
@@ -80,7 +80,7 @@ fun TableRow(date: String,hour: String,bpm: String,thickness:Int){
             hour,
             modifier = Modifier
                 .width(110.dp)
-                .padding(start = 10.dp), // Fixed width for hour column
+                .padding(start = 10.dp),
             color = MaterialTheme.colorScheme.onSecondary,
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.End
@@ -92,7 +92,7 @@ fun TableRow(date: String,hour: String,bpm: String,thickness:Int){
                 .padding(end = 16.dp),
             color = MaterialTheme.colorScheme.onSecondary,
             style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.End // Align BPM to the right
+            textAlign = TextAlign.End
         )
     }
     HorizontalDivider(
