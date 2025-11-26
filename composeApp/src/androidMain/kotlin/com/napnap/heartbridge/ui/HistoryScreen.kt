@@ -25,13 +25,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun HistoryScreen(){
-
+fun HistoryScreen(viewModel: HistoryViewModel){
     val context = LocalContext.current
-    val viewModel: HistoryViewModel = viewModel()
     val rows by viewModel.rows.collectAsState()
 
     Column(

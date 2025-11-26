@@ -28,16 +28,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.napnap.heartbridge.ui.components.DialogBox
 
 @Composable
-fun MainScreen(){
+fun MainScreen(viewModel: MainViewModel){
     Column(
         modifier = Modifier.fillMaxWidth(),
     ){
         val context = LocalContext.current
-        val viewModel: MainViewModel = viewModel()
 
         val showDialog by viewModel.showDialog.collectAsState()
         val devices by viewModel.devices.collectAsState()
@@ -102,7 +100,7 @@ fun MainScreen(){
                     Icon(
                         Icons.Default.Battery0Bar,
                         "",
-                        modifier = Modifier.padding(end = 10.dp),
+                        modifier = Modifier.padding(top= 2.dp,end = 10.dp),
                         tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }

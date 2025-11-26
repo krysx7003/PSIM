@@ -25,16 +25,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun SettingsScreen(){
-    val viewModel: SettingsViewModel = viewModel()
-
+fun SettingsScreen(viewModel: SettingsViewModel){
     val measurementIntervalState by viewModel.measurementInterval.collectAsState()
     val maxHistoryState by viewModel.maxHistory.collectAsState()
     val resetEnabledState by viewModel.resetEnabled.collectAsState()
@@ -44,8 +42,6 @@ fun SettingsScreen(){
     var resetEnabled by remember { mutableStateOf(resetEnabledState) }
 
     Column {
-
-
         Text(
             "Pomiary",
             modifier = Modifier
@@ -164,9 +160,9 @@ fun SettingsScreen(){
         Button(
             onClick = {
                 viewModel.updateSettings(
-                    interval = measurementInterval.text,
-                    history = maxHistory.text,
-                    reset = resetEnabled
+                    measurementInterval.text,
+                     maxHistory.text,
+                     resetEnabled
                 )
             },
             modifier = Modifier
