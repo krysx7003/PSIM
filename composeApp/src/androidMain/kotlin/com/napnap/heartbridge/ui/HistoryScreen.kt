@@ -28,7 +28,19 @@ import com.napnap.heartbridge.Measurement
 @Composable
 fun HistoryScreen(){
 
-    val rows = listOf<Measurement>(Measurement("02-05-2005","21:37","0"))
+    val rows = listOf(
+        Measurement("02-05-2025", "08:15", "65"),
+        Measurement("02-05-2025", "08:30", "68"),
+        Measurement("02-05-2025", "08:45", "72"),
+        Measurement("02-05-2025", "09:00", "70"),
+        Measurement("02-05-2025", "09:15", "67"),
+
+        Measurement("03-05-2025", "14:20", "74"),
+        Measurement("03-05-2025", "14:35", "71"),
+        Measurement("03-05-2025", "14:50", "69"),
+        Measurement("03-05-2025", "15:05", "76"),
+        Measurement("03-05-2025", "15:20", "73")
+    )
     val context = LocalContext.current
     Column(
         modifier = Modifier.fillMaxWidth(),
