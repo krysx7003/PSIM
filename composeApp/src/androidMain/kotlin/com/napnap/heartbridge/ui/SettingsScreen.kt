@@ -1,6 +1,5 @@
 package com.napnap.heartbridge.ui
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
@@ -18,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,19 +25,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun SettingsScreen(){
-    var measurementInterval by remember { mutableStateOf(TextFieldValue("15")) }
-    var maxHistory by remember { mutableStateOf(TextFieldValue("30")) }
-    var resetEnabled by remember { mutableStateOf(false) }
+    val viewModel: SettingsViewModel = viewModel()
 
-    val context = LocalContext.current
+    val measurementIntervalState by viewModel.measurementInterval.collectAsState()
+    val maxHistoryState by viewModel.maxHistory.collectAsState()
+    val resetEnabledState by viewModel.resetEnabled.collectAsState()
+
+    var measurementInterval by remember { mutableStateOf(TextFieldValue(measurementIntervalState)) }
+    var maxHistory by remember { mutableStateOf(TextFieldValue(maxHistoryState)) }
+    var resetEnabled by remember { mutableStateOf(resetEnabledState) }
+
     Column {
 
 
@@ -158,11 +163,11 @@ fun SettingsScreen(){
         }
         Button(
             onClick = {
-                Toast.makeText(
-                    context,
-                    "Zapisuje",
-                    Toast.LENGTH_SHORT
-                ).show()
+                viewModel.updateSettings(
+                    interval = measurementInterval.text,
+                    history = maxHistory.text,
+                    reset = resetEnabled
+                )
             },
             modifier = Modifier
                 .padding( 16.dp,10.dp)

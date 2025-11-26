@@ -20,17 +20,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.napnap.heartbridge.ui.components.DialogBox
 
 @Composable
@@ -38,35 +36,39 @@ fun MainScreen(){
     Column(
         modifier = Modifier.fillMaxWidth(),
     ){
-        val text = "---"
         val context = LocalContext.current
-        var showDialog by remember { mutableStateOf(false) }
-        val devices = listOf(
-            "Samsung Watch 6",
-            "Apple Watch Series 9",
-            "Fitbit Sense 2")
+        val viewModel: MainViewModel = viewModel()
+
+        val showDialog by viewModel.showDialog.collectAsState()
+        val devices by viewModel.devices.collectAsState()
+        val bpm by viewModel.bpm.collectAsState()
+        val device by viewModel.device.collectAsState()
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable{
-                    Toast.makeText(
-                        context,
-                        "No device connected",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    if(device.name == "Brak urządzenia"){
+                        Toast.makeText(
+                            context,
+                            "No device connected",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
                 },
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.Bottom
         ) {
-            if (text.length == 3){
+            if (bpm.length == 3){
                 Spacer(modifier = Modifier.weight(4f))
-            }else if(text.length == 2){
+            }else if(bpm.length == 2){
                 Spacer(modifier = Modifier.weight(2.5f))
 
             }
 
             Text(
-                text,
+                bpm,
                 style = MaterialTheme.typography.bodyLarge,
                 color = Color.Red
             )
@@ -94,9 +96,9 @@ fun MainScreen(){
                     .fillMaxWidth() ,
                 horizontalArrangement = Arrangement.SpaceBetween
             ){
-                Text( "Brak urządzenia", style = MaterialTheme.typography.bodyMedium)
+                Text( device.name, style = MaterialTheme.typography.bodyMedium)
                 Row{
-                    Text( "--%", style = MaterialTheme.typography.bodyMedium)
+                    Text( device.battery, style = MaterialTheme.typography.bodyMedium)
                     Icon(
                         Icons.Default.Battery0Bar,
                         "",
@@ -109,7 +111,7 @@ fun MainScreen(){
 
         Button(
             onClick = {
-                showDialog = true
+                viewModel.showDialog()
             },
             modifier = Modifier
                 .padding( 16.dp,5.dp)
@@ -123,7 +125,7 @@ fun MainScreen(){
             Text(text = "Wyszukaj urządzenia", style = MaterialTheme.typography.bodyMedium)
         }
         if(showDialog){
-            DialogBox(devices,{ showDialog = false })
+            DialogBox(devices) { viewModel.hideDialog() }
         }
 
     }

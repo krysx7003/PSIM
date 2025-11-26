@@ -17,31 +17,23 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.napnap.heartbridge.Measurement
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun HistoryScreen(){
 
-    val rows = listOf(
-        Measurement("02-05-2025", "08:15", "65"),
-        Measurement("02-05-2025", "08:30", "68"),
-        Measurement("02-05-2025", "08:45", "72"),
-        Measurement("02-05-2025", "09:00", "70"),
-        Measurement("02-05-2025", "09:15", "67"),
-
-        Measurement("03-05-2025", "14:20", "74"),
-        Measurement("03-05-2025", "14:35", "71"),
-        Measurement("03-05-2025", "14:50", "69"),
-        Measurement("03-05-2025", "15:05", "76"),
-        Measurement("03-05-2025", "15:20", "73")
-    )
     val context = LocalContext.current
+    val viewModel: HistoryViewModel = viewModel()
+    val rows by viewModel.rows.collectAsState()
+
     Column(
         modifier = Modifier.fillMaxWidth(),
     ){
