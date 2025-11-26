@@ -7,6 +7,7 @@ val DarkColorScheme = darkColorScheme(
     primary = Color.Red,
     onPrimary = Color.White,
     secondary = Color.DarkGray,
+    onSecondary = Color.Red,
     background =  Color.White,
     onBackground = Color.Red
 )
