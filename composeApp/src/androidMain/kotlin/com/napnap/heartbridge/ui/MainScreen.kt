@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.napnap.heartbridge.ui.components.DialogBox
+import java.util.jar.Manifest
 
 @Composable
 fun MainScreen(viewModel: MainViewModel){

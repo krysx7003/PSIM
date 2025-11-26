@@ -2,6 +2,8 @@ package com.napnap.heartbridge
 
 
 
+import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -12,25 +14,32 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.napnap.heartbridge.theme.AppTheme
 import com.napnap.heartbridge.ui.HistoryScreen
 import com.napnap.heartbridge.ui.HistoryViewModel
 import com.napnap.heartbridge.ui.MainScreen
 import com.napnap.heartbridge.ui.MainViewModel
-import com.napnap.heartbridge.ui.Screen
 import com.napnap.heartbridge.ui.SettingsScreen
 import com.napnap.heartbridge.ui.SettingsViewModel
 import com.napnap.heartbridge.ui.components.AppTopBar
-import com.napnap.heartbridge.ui.components.SettingsStore
+import com.napnap.heartbridge.ui.components.Screen
+import java.util.concurrent.TimeUnit
 
 @Composable
 fun App() {
     AppTheme {
         val navController = rememberNavController()
+        val context = LocalContext.current
 
         val mainViewModel: MainViewModel = viewModel()
         val settingsViewModel: SettingsViewModel = viewModel()
         val historyViewModel: HistoryViewModel = viewModel()
+
+        startWorker(context,settingsViewModel)
 
         Scaffold(
             modifier = Modifier.fillMaxSize(),
@@ -47,4 +56,20 @@ fun App() {
             }
         }
     }
+}
+
+fun startWorker(context: Context,settingsViewModel: SettingsViewModel){
+    val time = settingsViewModel.measurementInterval.value
+
+    val request = PeriodicWorkRequestBuilder<NotificationWorker>(
+        time.toLong(),
+        TimeUnit.MINUTES
+    ).build()
+
+    Log.d("WORKER", "calling doWork()")
+    WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+        "notification_worker",
+        ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+        request
+    )
 }
