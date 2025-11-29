@@ -2,6 +2,7 @@ package com.napnap.heartbridge.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -30,9 +31,12 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.work.WorkManager
 
 @Composable
 fun SettingsScreen(viewModel: SettingsViewModel){
+    val context = LocalContext.current
+
     val measurementIntervalState by viewModel.measurementInterval.collectAsState()
     val maxHistoryState by viewModel.maxHistory.collectAsState()
     val resetEnabledState by viewModel.resetEnabled.collectAsState()
@@ -157,24 +161,44 @@ fun SettingsScreen(viewModel: SettingsViewModel){
                 singleLine = true,
             )
         }
-        Button(
-            onClick = {
-                viewModel.updateSettings(
-                    measurementInterval.text,
-                     maxHistory.text,
-                     resetEnabled
-                )
-            },
-            modifier = Modifier
-                .padding( 16.dp,10.dp)
-                .align(Alignment.End),
-            shape = RoundedCornerShape(8.dp),
-            contentPadding = PaddingValues(12.dp),
-            colors = ButtonDefaults.buttonColors(
-                contentColor = Color.Black
-            )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
         ){
-            Text(text = "Zapisz", style = MaterialTheme.typography.bodySmall)
+            Button(
+                onClick = {
+                    WorkManager.getInstance(context).cancelAllWork()
+                },
+                modifier = Modifier
+                    .padding( 16.dp,10.dp),
+                shape = RoundedCornerShape(8.dp),
+                contentPadding = PaddingValues(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    contentColor = Color.Black
+                )
+            ){
+                Text(text = "Zatrzymaj pomiary", style = MaterialTheme.typography.bodySmall)
+            }
+
+            Button(
+                onClick = {
+                    viewModel.updateSettings(
+                        measurementInterval.text,
+                        maxHistory.text,
+                        resetEnabled
+                    )
+                },
+                modifier = Modifier
+                    .padding( 16.dp,10.dp),
+                shape = RoundedCornerShape(8.dp),
+                contentPadding = PaddingValues(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    contentColor = Color.Black
+                )
+            ){
+                Text(text = "Zapisz", style = MaterialTheme.typography.bodySmall)
+            }
         }
     }
 }
+
