@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.napnap.heartbridge.ui.Screen
+import com.napnap.heartbridge.ui.components.Screen
 
 @Composable
 fun AppTopBar( navController: NavHostController) {

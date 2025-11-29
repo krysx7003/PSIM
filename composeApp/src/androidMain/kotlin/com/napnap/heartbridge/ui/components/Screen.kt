@@ -1,4 +1,4 @@
-package com.napnap.heartbridge.ui
+package com.napnap.heartbridge.ui.components
 
 sealed class Screen(val route: String,val title: String) {
     object Main : Screen("main_screen","")

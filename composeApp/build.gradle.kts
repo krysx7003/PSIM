@@ -36,6 +36,7 @@ kotlin {
             implementation(compose.material3)
             implementation(libs.androidx.datastore.preferences)
             implementation("org.jetbrains.compose.material:material-icons-extended:1.7.3")
+            implementation("androidx.work:work-runtime-ktx:2.11.0")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

@@ -1,8 +1,8 @@
 package com.napnap.heartbridge.ui
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -18,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,17 +31,21 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.work.WorkManager
 
 @Composable
-fun SettingsScreen(){
-    var measurementInterval by remember { mutableStateOf(TextFieldValue("15")) }
-    var maxHistory by remember { mutableStateOf(TextFieldValue("30")) }
-    var resetEnabled by remember { mutableStateOf(false) }
-
+fun SettingsScreen(viewModel: SettingsViewModel){
     val context = LocalContext.current
+
+    val measurementIntervalState by viewModel.measurementInterval.collectAsState()
+    val maxHistoryState by viewModel.maxHistory.collectAsState()
+    val resetEnabledState by viewModel.resetEnabled.collectAsState()
+
+    var measurementInterval by remember { mutableStateOf(TextFieldValue(measurementIntervalState)) }
+    var maxHistory by remember { mutableStateOf(TextFieldValue(maxHistoryState)) }
+    var resetEnabled by remember { mutableStateOf(resetEnabledState) }
+
     Column {
-
-
         Text(
             "Pomiary",
             modifier = Modifier
@@ -156,24 +161,44 @@ fun SettingsScreen(){
                 singleLine = true,
             )
         }
-        Button(
-            onClick = {
-                Toast.makeText(
-                    context,
-                    "Zapisuje",
-                    Toast.LENGTH_SHORT
-                ).show()
-            },
-            modifier = Modifier
-                .padding( 16.dp,10.dp)
-                .align(Alignment.End),
-            shape = RoundedCornerShape(8.dp),
-            contentPadding = PaddingValues(12.dp),
-            colors = ButtonDefaults.buttonColors(
-                contentColor = Color.Black
-            )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
         ){
-            Text(text = "Zapisz", style = MaterialTheme.typography.bodySmall)
+            Button(
+                onClick = {
+                    WorkManager.getInstance(context).cancelAllWork()
+                },
+                modifier = Modifier
+                    .padding( 16.dp,10.dp),
+                shape = RoundedCornerShape(8.dp),
+                contentPadding = PaddingValues(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    contentColor = Color.Black
+                )
+            ){
+                Text(text = "Zatrzymaj pomiary", style = MaterialTheme.typography.bodySmall)
+            }
+
+            Button(
+                onClick = {
+                    viewModel.updateSettings(
+                        measurementInterval.text,
+                        maxHistory.text,
+                        resetEnabled
+                    )
+                },
+                modifier = Modifier
+                    .padding( 16.dp,10.dp),
+                shape = RoundedCornerShape(8.dp),
+                contentPadding = PaddingValues(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    contentColor = Color.Black
+                )
+            ){
+                Text(text = "Zapisz", style = MaterialTheme.typography.bodySmall)
+            }
         }
     }
 }
+
