@@ -2,6 +2,9 @@
 
 package com.napnap.heartbridge.ui.components
 
+import android.Manifest
+import android.bluetooth.BluetoothDevice
+import android.content.pm.PackageManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,11 +25,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 
 @Composable
-fun DialogBox(devices: List<String>, onDismissRequest: () -> Unit ){
+
+fun DialogBox(devices: List<BluetoothDevice>, onDismissRequest: () -> Unit ){
+    val context = LocalContext.current
+    if (ActivityCompat.checkSelfPermission(
+            context,
+            Manifest.permission.BLUETOOTH_CONNECT
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
+        // TODO: Consider calling
+        //    ActivityCompat#requestPermissions
+        // here to request the missing permissions, and then overriding
+        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+        //                                          int[] grantResults)
+        // to handle the case where the user grants the permission. See the documentation
+        // for ActivityCompat#requestPermissions for more details.
+        return
+    }
     BasicAlertDialog(
         onDismissRequest = onDismissRequest,
     ){
@@ -68,8 +89,9 @@ fun DialogBox(devices: List<String>, onDismissRequest: () -> Unit ){
                                 containerColor = Color.White,
                             )
                         ){
+                            val name = item.name ?: "NONAME"
                             Text(
-                                text = item ,
+                                text = name,
                                 modifier = Modifier
                                     .fillMaxWidth(),
                                 color = MaterialTheme.colorScheme.onSecondary,

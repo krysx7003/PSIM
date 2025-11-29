@@ -36,6 +36,7 @@ fun App() {
         val context = LocalContext.current
 
         val mainViewModel: MainViewModel = viewModel()
+        mainViewModel.initConnection(context)
         val settingsViewModel: SettingsViewModel = viewModel()
         val historyViewModel: HistoryViewModel = viewModel()
 

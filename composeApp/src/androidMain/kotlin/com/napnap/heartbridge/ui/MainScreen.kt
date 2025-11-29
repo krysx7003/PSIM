@@ -1,5 +1,6 @@
 package com.napnap.heartbridge.ui
 
+import android.content.pm.PackageManager
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
 import com.napnap.heartbridge.ui.components.DialogBox
 import java.util.jar.Manifest
 
@@ -110,7 +112,11 @@ fun MainScreen(viewModel: MainViewModel){
 
         Button(
             onClick = {
-                viewModel.showDialog()
+                if (ActivityCompat.checkSelfPermission(
+                        context,
+                        android.Manifest.permission.BLUETOOTH_CONNECT
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) else viewModel.showDialog(context)
             },
             modifier = Modifier
                 .padding( 16.dp,5.dp)
