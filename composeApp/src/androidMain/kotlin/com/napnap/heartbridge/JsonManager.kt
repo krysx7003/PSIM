@@ -8,8 +8,10 @@ import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.FileNotFoundException
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import kotlin.text.toInt
 
 object JsonManager {
     private var data: List<Measurement> = emptyList()
@@ -54,6 +56,29 @@ object JsonManager {
             Log.e("JSON_DELETE","Couldn't parse date reason: $e")
         }
         return false
+    }
+
+    fun appendMany(context: Context,measurements: List<Int>,name: String){
+        if (measurements.isEmpty()) return
+
+        val averageBpm = measurements.average().toInt()
+        val currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+        val currentTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
+        val nextId = try {
+            val currentData = load(context)
+            (currentData.maxByOrNull { it.id }?.id ?: 0) + 1
+        } catch (e: Exception) {
+            Log.e("JSON_DELETE","Couldn't parse date reason: $e")
+            1
+        }
+        val averageMeasurement = Measurement(
+            id = nextId,
+            date = currentDate,
+            hour = currentTime,
+            bpm = averageBpm.toString(),
+            device = name
+        )
+        append(context, averageMeasurement)
     }
 
     fun append(context: Context,value: Measurement):List<Measurement> {

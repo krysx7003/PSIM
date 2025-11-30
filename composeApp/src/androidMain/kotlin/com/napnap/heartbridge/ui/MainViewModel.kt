@@ -15,6 +15,7 @@ import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.lifecycle.ViewModel
 import com.napnap.heartbridge.ConnectBLE
+import com.napnap.heartbridge.JsonManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,6 +27,7 @@ class MainViewModel: ViewModel() {
 
     private val _bpm = MutableStateFlow("---")
     val bpm: StateFlow<String> = _bpm.asStateFlow()
+    private var measurements: List<Int> = emptyList()
 
     private val _devices = MutableStateFlow<List<BluetoothDevice>>(emptyList())
     val devices: StateFlow<List<BluetoothDevice>> = _devices.asStateFlow()
@@ -100,6 +102,15 @@ class MainViewModel: ViewModel() {
     }
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
+    fun saveMeasurement(context: Context, receivedBpm:Int){
+        measurements += receivedBpm
+        if(measurements.size > 10){
+            JsonManager.appendMany(context,measurements,_device.value!!.name)
+            measurements = emptyList()
+        }
+    }
+
+    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     fun measureBPM(device: BluetoothDevice, context: Context) {
 
         val bluetoothGattCallback = object : BluetoothGattCallback() {
@@ -149,6 +160,7 @@ class MainViewModel: ViewModel() {
             }
 
 
+            @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
             override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
                 val data = characteristic.value
                 if (characteristic.uuid == bpmCharUUID) {
@@ -164,6 +176,7 @@ class MainViewModel: ViewModel() {
                         val receivedBpm = data[13].toUByte().toInt()
                         Log.i("BLE-Test", "BPM from ${characteristic.uuid}: $receivedBpm")
                         _bpm.value = receivedBpm.toString()
+                        saveMeasurement(context,receivedBpm)
                     }
                 }
             }
