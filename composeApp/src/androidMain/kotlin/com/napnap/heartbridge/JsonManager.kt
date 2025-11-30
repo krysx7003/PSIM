@@ -1,16 +1,22 @@
 package com.napnap.heartbridge
 
 import android.content.Context
+import android.os.Environment
 import android.util.Log
+import android.widget.Toast
 import com.napnap.heartbridge.ui.components.SettingsStore
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.util.Date
+import java.util.Locale
 import kotlin.text.toInt
 
 object JsonManager {
@@ -91,6 +97,51 @@ object JsonManager {
         val jsonString = Json.encodeToString(data)
         saveToJson(context,jsonString)
         return data.sortedByDescending { it.id }
+    }
+    fun saveCSV(context: Context){
+        val csvHeader = "ID,Date,Hour,BPM,Device\n"
+
+        val csvContent = StringBuilder().apply {
+            append(csvHeader)
+            data.forEach { item ->
+                append("${item.id},${item.date},${item.hour},${item.bpm},${item.device}\n")
+            }
+        }.toString()
+
+        saveToDownloads(context,csvContent)
+    }
+    fun saveToDownloads(context: Context, csvContent: String) {
+        try {
+            val timeStamp = SimpleDateFormat("ddMMyyyy", Locale.getDefault()).format(Date())
+            val fileName = "heart_rate_data_$timeStamp.csv"
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                val contentValues = android.content.ContentValues().apply {
+                    put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+                    put(android.provider.MediaStore.MediaColumns.MIME_TYPE, "text/csv")
+                    put(android.provider.MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+                }
+                val resolver = context.contentResolver
+                val uri = resolver.insert(android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+
+                uri?.let {
+                    resolver.openOutputStream(it)?.use { outputStream ->
+                        outputStream.write(csvContent.toByteArray())
+                    }
+                }
+            } else {
+                val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                val file = File(downloadsDir, fileName)
+
+                FileOutputStream(file).use { outputStream ->
+                    outputStream.write(csvContent.toByteArray())
+                }
+            }
+            Toast.makeText(context, "CSV saved to Downloads", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(context, "Failed to save CSV: ${e.message}", Toast.LENGTH_LONG).show()
+        }
     }
 
     fun save(context: Context,list: List<Measurement>) {

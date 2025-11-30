@@ -25,6 +25,7 @@ class MainActivity : ComponentActivity() {
             permissions += Manifest.permission.BLUETOOTH_CONNECT
             permissions += Manifest.permission.ACCESS_FINE_LOCATION
             permissions += Manifest.permission.POST_NOTIFICATIONS
+            permissions += Manifest.permission.WRITE_EXTERNAL_STORAGE
         }
 
         permissions += Manifest.permission.BLUETOOTH

@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.napnap.heartbridge.JsonManager
 
 @Composable
 fun HistoryScreen(viewModel: HistoryViewModel){
@@ -37,11 +38,7 @@ fun HistoryScreen(viewModel: HistoryViewModel){
     ){
         Button(
             onClick = {
-                Toast.makeText(
-                        context,
-                        "Eksportuje",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                JsonManager.saveCSV(context)
             },
             modifier = Modifier
                 .padding( 16.dp,10.dp)
