@@ -29,11 +29,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.napnap.heartbridge.ConnectBLE
+import com.napnap.heartbridge.ui.MainViewModel
 
 @Composable
 
-fun DialogBox(devices: List<BluetoothDevice>, onDismissRequest: () -> Unit ){
+fun DialogBox(devices: List<BluetoothDevice>, onDismissRequest: () -> Unit, viewModel: MainViewModel ){
     val context = LocalContext.current
+
     if (ActivityCompat.checkSelfPermission(
             context,
             Manifest.permission.BLUETOOTH_CONNECT
@@ -41,6 +45,7 @@ fun DialogBox(devices: List<BluetoothDevice>, onDismissRequest: () -> Unit ){
     ) {
         return
     }
+
     BasicAlertDialog(
         onDismissRequest = onDismissRequest,
     ){
@@ -72,7 +77,8 @@ fun DialogBox(devices: List<BluetoothDevice>, onDismissRequest: () -> Unit ){
                 LazyColumn {
                     items(devices){ item ->
                         Button(
-                            onClick = {},
+                            onClick = {viewModel.connectBLE?.connectToDevice(device = item)
+                                      onDismissRequest()},
                             modifier = Modifier
                                 .fillMaxWidth(),
                             contentPadding = PaddingValues(12.dp),

@@ -69,12 +69,13 @@ class MainActivity : ComponentActivity() {
         connectBLE = ConnectBLE(this)
 
         val name = "Unknown device"
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.BLUETOOTH_CONNECT
+            ) != PackageManager.PERMISSION_GRANTED
+        ) else {
         connectBLE.onDeviceFound = { device ->
-            if (ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.BLUETOOTH_CONNECT
-                ) != PackageManager.PERMISSION_GRANTED
-            ) else {
+
                 val name = device.name ?: "Unknown device"
                 println("Znaleziono urządzenie: $name (${device.address})")
             }

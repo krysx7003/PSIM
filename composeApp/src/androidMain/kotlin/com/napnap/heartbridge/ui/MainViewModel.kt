@@ -4,7 +4,10 @@ import android.Manifest
 import android.app.Application
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import androidx.annotation.RequiresPermission
 import androidx.lifecycle.ViewModel
 import com.napnap.heartbridge.Device
@@ -23,10 +26,10 @@ class MainViewModel: ViewModel() {
     private val _devices = MutableStateFlow<List<BluetoothDevice>>(emptyList())
     val devices: StateFlow<List<BluetoothDevice>> = _devices.asStateFlow()
 
-    private val _device = MutableStateFlow(Device("Brak urządzenia","--%"))
-    val device = _device
+    private val _device = MutableStateFlow<BluetoothDevice?>(null)
+    val device :MutableStateFlow<BluetoothDevice?> = _device
 
-    private var connectBLE:ConnectBLE? = null
+    var connectBLE:ConnectBLE? = null
 
     fun initConnection(context: Context){
             connectBLE = ConnectBLE(context)
@@ -48,6 +51,22 @@ class MainViewModel: ViewModel() {
     fun hideDialog() {
         _showDialog.value = false
         connectBLE?.stopScan()
+        if (connectBLE?.getConnectedDevice() != null)
+            _device.value = connectBLE?.getConnectedDevice()
     }
 
+    fun getBatteryLevel(device: BluetoothDevice, context: Context): String {
+        val filter = IntentFilter("android.bluetooth.device.action.BATTERY_LEVEL_CHANGED")
+        var batlvl = "100%"
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                val batteryLevel = intent.getIntExtra("android.bluetooth.device.extra.BATTERY_LEVEL", -1)
+                if (batteryLevel != -1) {
+                    batlvl = batteryLevel.toString()
+                }
+            }
+        }
+        context.registerReceiver(receiver, filter)
+        return batlvl
+    }
 }
