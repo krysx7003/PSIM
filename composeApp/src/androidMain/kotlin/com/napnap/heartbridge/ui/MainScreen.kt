@@ -1,6 +1,7 @@
 package com.napnap.heartbridge.ui
 
 import android.content.pm.PackageManager
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -49,14 +50,6 @@ fun MainScreen(viewModel: MainViewModel){
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable{
-                    if(device.name == "Brak urządzenia"){
-                        Toast.makeText(
-                            context,
-                            "No device connected",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-
                 },
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.Bottom
@@ -96,10 +89,16 @@ fun MainScreen(viewModel: MainViewModel){
                     .padding(12.dp)
                     .fillMaxWidth() ,
                 horizontalArrangement = Arrangement.SpaceBetween
-            ){
-                Text( device.name, style = MaterialTheme.typography.bodyMedium)
+            ) {
+                var name = "No device connected"
+                var battery = "--%"
+                if (device != null) {
+                    name = device!!.name
+                    battery = viewModel.getBatteryLevel(device!!, context)
+                }
+                Text( name, style = MaterialTheme.typography.bodyMedium)
                 Row{
-                    Text( device.battery, style = MaterialTheme.typography.bodyMedium)
+                    Text( battery, style = MaterialTheme.typography.bodyMedium)
                     Icon(
                         Icons.Default.Battery0Bar,
                         "",
@@ -130,7 +129,7 @@ fun MainScreen(viewModel: MainViewModel){
             Text(text = "Wyszukaj urządzenia", style = MaterialTheme.typography.bodyMedium)
         }
         if(showDialog){
-            DialogBox(devices) { viewModel.hideDialog() }
+            DialogBox(devices, {viewModel.hideDialog(context)}, viewModel)
         }
 
     }

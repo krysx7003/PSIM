@@ -12,6 +12,7 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.content.Context
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
 
@@ -88,9 +89,12 @@ class ConnectBLE(private val context: Context) {
 
     fun getFoundDevices(): List<BluetoothDevice> = foundDevices
 
+    fun getConnectedDevice(): BluetoothDevice ?= bluetoothGatt?.device
+
     @RequiresPermission(allOf = [Manifest.permission.BLUETOOTH_CONNECT])
     fun connectToDevice(device: BluetoothDevice) {
         bluetoothGatt = device.connectGatt(context, false, gattCallback)
+        Log.i("connected", "Succesfully connected: ${bluetoothGatt?.device?.name}")
     }
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
@@ -111,12 +115,5 @@ class ConnectBLE(private val context: Context) {
             }
         }
 
-        override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
-            super.onServicesDiscovered(gatt, status)
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                println("Znaleziono usługi na urządzeniu")
-                // Możesz tu obsłużyć serwisy i charakterystyki
-            }
-        }
     }
 }

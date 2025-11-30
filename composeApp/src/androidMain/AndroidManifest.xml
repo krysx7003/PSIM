@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" /> <!-- od Android 12+ -->
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" /> <!-- od Android 12+ -->
+    <uses-permission android:name="android.bluetooth.device.action.BATTERY_LEVEL_CHANGED" />
     <application
         android:enableOnBackInvokedCallback="true"
         android:allowBackup="true"
