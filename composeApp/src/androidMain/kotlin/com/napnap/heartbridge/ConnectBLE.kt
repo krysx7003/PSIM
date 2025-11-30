@@ -5,7 +5,6 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
-import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothProfile
 import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
@@ -21,10 +20,8 @@ class ConnectBLE(private val context: Context) {
     private var bluetoothLeScanner: BluetoothLeScanner? = bluetoothAdapter?.bluetoothLeScanner
     private var isScanning = false
 
-    // Lista znalezionych urządzeń BLE
     private val foundDevices = mutableListOf<BluetoothDevice>()
 
-    // Callback do powiadamiania o nowych urządzeniach
     var onDeviceFound: ((BluetoothDevice) -> Unit)? = null
 
     private var bluetoothGatt: BluetoothGatt? = null
@@ -37,10 +34,12 @@ class ConnectBLE(private val context: Context) {
                     if (ActivityCompat.checkSelfPermission(
                             context,
                             Manifest.permission.BLUETOOTH_CONNECT
-                        ) != PackageManager.PERMISSION_GRANTED
-                    ) else if(device.name != null) {
-                        foundDevices.add(device)
-                        onDeviceFound?.invoke(device)
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
+                        if(device.name != null) {
+                            foundDevices.add(device)
+                            onDeviceFound?.invoke(device)
+                        }
                     }
                 }
             }
@@ -54,10 +53,12 @@ class ConnectBLE(private val context: Context) {
                     if (ActivityCompat.checkSelfPermission(
                             context,
                             Manifest.permission.BLUETOOTH_CONNECT
-                        ) != PackageManager.PERMISSION_GRANTED
-                    ) else if(device.name != null) {
-                        foundDevices.add(device)
-                        onDeviceFound?.invoke(device)
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
+                        if(device.name != null) {
+                            foundDevices.add(device)
+                            onDeviceFound?.invoke(device)
+                        }
                     }
                 }
             }
@@ -87,20 +88,12 @@ class ConnectBLE(private val context: Context) {
         }
     }
 
-    fun getFoundDevices(): List<BluetoothDevice> = foundDevices
-
     fun getConnectedDevice(): BluetoothDevice ?= bluetoothGatt?.device
 
     @RequiresPermission(allOf = [Manifest.permission.BLUETOOTH_CONNECT])
     fun connectToDevice(device: BluetoothDevice) {
         bluetoothGatt = device.connectGatt(context, false, gattCallback)
         Log.i("connected", "Succesfully connected: ${bluetoothGatt?.device?.name}")
-    }
-
-    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
-    fun disconnect() {
-        bluetoothGatt?.close()
-        bluetoothGatt = null
     }
 
     private val gattCallback = object : BluetoothGattCallback() {

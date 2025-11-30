@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun HistoryScreen(viewModel: HistoryViewModel){
     val context = LocalContext.current
+    viewModel.loadData(context)
     val rows by viewModel.rows.collectAsState()
 
     Column(

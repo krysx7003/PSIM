@@ -1,8 +1,6 @@
 package com.napnap.heartbridge.ui
 
 import android.Manifest
-import android.app.Application
-import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
@@ -16,13 +14,11 @@ import android.content.IntentFilter
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.lifecycle.ViewModel
-import com.napnap.heartbridge.Device
+import com.napnap.heartbridge.ConnectBLE
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import com.napnap.heartbridge.ConnectBLE
 import java.util.UUID
-import kotlin.concurrent.thread
 
 class MainViewModel: ViewModel() {
     private val _showDialog = MutableStateFlow(false)
@@ -40,14 +36,14 @@ class MainViewModel: ViewModel() {
     var connectBLE:ConnectBLE? = null
 
     fun initConnection(context: Context){
-            connectBLE = ConnectBLE(context)
-        }
+        connectBLE = ConnectBLE(context)
+    }
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
-    fun showDialog(context: Context) {
+    fun showDialog() {
         _showDialog.value = true
         connectBLE?.onDeviceFound = { device ->
-            val currentList = _devices.value ?: emptyList()
+            val currentList = _devices.value
             if (!currentList.any { it.address == device.address }) {
                 _devices.value = currentList + device
             }
@@ -59,12 +55,13 @@ class MainViewModel: ViewModel() {
     fun hideDialog(context: Context) {
         _showDialog.value = false
         connectBLE?.stopScan()
-        if (connectBLE?.getConnectedDevice() != null)
+        if (connectBLE?.getConnectedDevice() != null){
             _device.value = connectBLE?.getConnectedDevice()
             measureBPM(_device.value!!, context)
+        }
     }
 
-    fun getBatteryLevel(device: BluetoothDevice, context: Context): String {
+    fun getBatteryLevel( context: Context): String {
         val filter = IntentFilter("android.bluetooth.device.action.BATTERY_LEVEL_CHANGED")
         var batlvl = "100%"
         val receiver = object : BroadcastReceiver() {
@@ -79,17 +76,18 @@ class MainViewModel: ViewModel() {
         return batlvl
     }
 
-    val MineUUID = UUID.fromString("4cdabaa2-2cea-c0c1-b38d-a0481ae60a97")
+    val bpmCharUUID:UUID = UUID.fromString("4cdabaa2-2cea-c0c1-b38d-a0481ae60a97")
 
+    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     fun startBpmMeasurement(gatt: BluetoothGatt) {
         val characteristic = gatt.services
             .flatMap { it.characteristics }
-            .firstOrNull { it.uuid == MineUUID }
+            .firstOrNull { it.uuid == bpmCharUUID }
 
-        characteristic?.let {
+        characteristic?.let  {
             // Przykładowy 21-bajtowy pakiet, tylko 17-ty bajt ustawiamy na 1 do startu pomiaru
             for (i in 0 until 21) {
-                val command = ByteArray(21) { 0 }
+                val command = ByteArray(21)
                 command[i] = 1 // bajt kontrolny start/stop pomiaru
 
                 it.value = command
@@ -103,8 +101,6 @@ class MainViewModel: ViewModel() {
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     fun measureBPM(device: BluetoothDevice, context: Context) {
-        val HEART_RATE_SERVICE_UUID = UUID.fromString("0000180d-0000-1000-8000-00805f9b34fb")
-        val HEART_RATE_MEASUREMENT_CHAR_UUID = UUID.fromString("00002a37-0000-1000-8000-00805f9b34fb")
 
         val bluetoothGattCallback = object : BluetoothGattCallback() {
 
@@ -127,7 +123,7 @@ class MainViewModel: ViewModel() {
 
                     val characteristic = gatt.services
                         .flatMap { it.characteristics }
-                        .firstOrNull { it.uuid == MineUUID }
+                        .firstOrNull { it.uuid == bpmCharUUID }
 
                     if (characteristic != null) {
                         gatt.setCharacteristicNotification(characteristic, true)
@@ -137,12 +133,12 @@ class MainViewModel: ViewModel() {
                         if (descriptor != null) {
                             descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
                             gatt.writeDescriptor(descriptor)
-                            Log.i("BLE-Test", "Notifications enabled for characteristic $MineUUID")
+                            Log.i("BLE-Test", "Notifications enabled for characteristic $bpmCharUUID")
                         } else {
-                            Log.w("BLE-Test", "Descriptor not found for characteristic $MineUUID")
+                            Log.w("BLE-Test", "Descriptor not found for characteristic $bpmCharUUID")
                         }
                     } else {
-                        Log.w("BLE-Test", "Characteristic $MineUUID not found")
+                        Log.w("BLE-Test", "Characteristic $bpmCharUUID not found")
                     }
                 } else {
                     Log.w("BLE-Test", "onServicesDiscovered received: $status")
@@ -155,7 +151,7 @@ class MainViewModel: ViewModel() {
 
             override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
                 val data = characteristic.value
-                if (characteristic.uuid == MineUUID) {
+                if (characteristic.uuid == bpmCharUUID) {
                     Log.i(
                         "BLE-Test",
                         "Data from characteristic ${characteristic.uuid}: ${
@@ -165,9 +161,9 @@ class MainViewModel: ViewModel() {
                         }"
                     )
                     if (data != null && data.isNotEmpty()) {
-                        val bpm = data[13].toUByte().toInt()
-                        Log.i("BLE-Test", "BPM from ${characteristic.uuid}: $bpm")
-                        _bpm.value = bpm.toString()
+                        val receivedBpm = data[13].toUByte().toInt()
+                        Log.i("BLE-Test", "BPM from ${characteristic.uuid}: $receivedBpm")
+                        _bpm.value = receivedBpm.toString()
                     }
                 }
             }

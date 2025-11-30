@@ -15,7 +15,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.napnap.heartbridge.theme.AppTheme
@@ -27,6 +26,7 @@ import com.napnap.heartbridge.ui.SettingsScreen
 import com.napnap.heartbridge.ui.SettingsViewModel
 import com.napnap.heartbridge.ui.components.AppTopBar
 import com.napnap.heartbridge.ui.components.Screen
+import com.napnap.heartbridge.ui.components.SettingsStore
 import java.util.concurrent.TimeUnit
 
 @Composable
@@ -40,7 +40,7 @@ fun App() {
         val settingsViewModel: SettingsViewModel = viewModel()
         val historyViewModel: HistoryViewModel = viewModel()
 
-        startWorker(context,settingsViewModel)
+        startWorker(context)
 
         Scaffold(
             modifier = Modifier.fillMaxSize(),
@@ -58,9 +58,8 @@ fun App() {
         }
     }
 }
-
-fun startWorker(context: Context,settingsViewModel: SettingsViewModel){
-    val time = settingsViewModel.measurementInterval.value
+fun startWorker(context: Context){
+    val time = SettingsStore.readS(context,"interval","15")
 
     val request = PeriodicWorkRequestBuilder<NotificationWorker>(
         time.toLong(),
