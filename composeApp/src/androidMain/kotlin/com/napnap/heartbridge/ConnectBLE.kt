@@ -115,12 +115,5 @@ class ConnectBLE(private val context: Context) {
             }
         }
 
-        override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
-            super.onServicesDiscovered(gatt, status)
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                println("Znaleziono usługi na urządzeniu")
-                // Możesz tu obsłużyć serwisy i charakterystyki
-            }
-        }
     }
 }

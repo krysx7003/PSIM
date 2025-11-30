@@ -129,7 +129,7 @@ fun MainScreen(viewModel: MainViewModel){
             Text(text = "Wyszukaj urządzenia", style = MaterialTheme.typography.bodyMedium)
         }
         if(showDialog){
-            DialogBox(devices, {viewModel.hideDialog()}, viewModel)
+            DialogBox(devices, {viewModel.hideDialog(context)}, viewModel)
         }
 
     }
