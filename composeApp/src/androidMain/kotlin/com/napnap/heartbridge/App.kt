@@ -40,6 +40,22 @@ fun App() {
         val settingsViewModel: SettingsViewModel = viewModel()
         val historyViewModel: HistoryViewModel = viewModel()
 
+//        val rows = listOf(
+//            Measurement(10,"30-11-2025", "15:20", "73","Z325"),
+//            Measurement(9, "30-11-2025", "15:05", "76","Z325"),
+//            Measurement(8, "30-11-2025", "14:50", "69","Z325"),
+//            Measurement(7, "30-11-2025", "14:35", "71","Z325"),
+//            Measurement(6, "30-11-2025", "14:20", "74","Z325"),
+//
+//            Measurement(5, "29-11-2025", "09:15", "67","Z325"),
+//            Measurement(4, "29-11-2025", "09:00", "70","Z325"),
+//            Measurement(3, "29-11-2025", "08:45", "72","Z325"),
+//            Measurement(2, "29-11-2025", "08:30", "68","Z325"),
+//            Measurement(1, "29-11-2025", "08:15", "65","Z325"),
+//        )
+//        JsonManager.save(context,rows)
+
+
         startWorker(context)
 
         Scaffold(
